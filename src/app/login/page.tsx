@@ -31,7 +31,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: 'var(--t3)', marginBottom: '5px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Contraseña</label>
             <input name="password" type="password" required placeholder="••••••••" style={{ width: '100%', padding: '12px 14px', backgroundColor: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 'var(--r)', color: 'var(--t1)', outline: 'none' }} />
           </div>
-          <button type="submit" style={{ marginTop: '10px', width: '100%', padding: '14px', backgroundColor: 'var(--vocal)', color: '#fff', border: 'none', borderRadius: 'var(--r)', fontWeight: 700, cursor: 'pointer', transition: 'opacity 0.2s' }} onMouseOver={e => (e.currentTarget.style.opacity = '0.9')} onMouseOut={e => (e.currentTarget.style.opacity = '1')}>
+          <button type="submit" style={{ marginTop: '10px', width: '100%', padding: '14px', backgroundColor: 'var(--vocal)', color: '#fff', border: 'none', borderRadius: 'var(--r)', fontWeight: 700, cursor: 'pointer', transition: 'opacity 0.2s' }}>
             Entrar a la plataforma
           </button>
         </form>
