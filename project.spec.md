@@ -33,14 +33,14 @@
 > **Objetivo:** Controlar el acceso al manual y herramientas mediante suscripción mensual.
 
 ### 3.1 — Autenticación (Supabase Auth)
-- [ ] Registro de usuario con email y contraseña (vía Supabase Auth).
-- [ ] Login / Logout con sesión persistente.
+- [x] Registro de usuario con email y contraseña (vía Supabase Auth).
+- [x] Login / Logout con sesión persistente.
 - [ ] Recuperación de contraseña por email (email transaccional via **Resend**).
 - [ ] Página de perfil básico del alumno (`/perfil`): estado de suscripción, días de trial restantes.
 
 ### 3.2 — Roles de Usuario
-- [ ] Definir dos roles en la tabla `profiles` de Supabase: `alumno` y `productor`.
-- [ ] Middleware de Next.js (`middleware.ts`) para proteger rutas según rol:
+- [x] Definir dos roles en la tabla `profiles` de Supabase: `alumno` y `productor`.
+- [x] Middleware de Next.js (`middleware.ts`) para proteger rutas según rol:
   - `/app/*` → solo accesible por usuarios con suscripción `trialing` o `active`.
   - `/admin/*` → solo accesible por usuarios con rol `productor`.
   - Sin sesión → redirigir a `/login`.
