@@ -154,6 +154,9 @@ export default function Navbar() {
           <Link href="/app/noticias" style={navLinkStyle}>
             📰 Noticias
           </Link>
+          <Link href="/app/perfil" style={navLinkStyle}>
+            👤 Mi Perfil
+          </Link>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', paddingLeft: '16px', borderLeft: '1px solid var(--border)', position: 'relative' }}>
             

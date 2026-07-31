@@ -28,7 +28,10 @@ export async function getProfileBannerData() {
       .eq('id', user.id)
       .single()
 
-    if (profile && (!profile.document_id || !profile.phone_number)) {
+    if (profile && (
+      !profile.document_id || profile.document_id.trim() === '' || 
+      !profile.phone_number || profile.phone_number.trim() === ''
+    )) {
       return true
     }
     
