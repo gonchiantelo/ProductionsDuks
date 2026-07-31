@@ -1,13 +1,14 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
 import { useEffect, useState } from 'react'
 import type { User } from '@supabase/supabase-js'
 
 export default function Navbar() {
   const router = useRouter()
+  const pathname = usePathname()
   const [user, setUser] = useState<User | null>(null)
   const [role, setRole] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -106,6 +107,8 @@ export default function Navbar() {
   }
 
   const hasUnread = notifications.some(n => !n.is_read)
+
+  if (pathname === '/app/onboarding') return null;
 
   return (
     <nav style={{
