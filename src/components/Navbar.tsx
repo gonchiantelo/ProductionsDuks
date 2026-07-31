@@ -12,6 +12,7 @@ export default function Navbar() {
   const [role, setRole] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [showNotifications, setShowNotifications] = useState(false)
+  const [notifications, setNotifications] = useState<any[]>([])
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -29,11 +30,28 @@ export default function Navbar() {
       }
     }
 
+    const fetchNotifications = async (userId: string) => {
+      try {
+        const { data } = await supabase
+          .from('notifications')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false })
+          .limit(10)
+        if (mounted && data) {
+          setNotifications(data)
+        }
+      } catch (err) {
+        console.error('Error fetching notifications', err)
+      }
+    }
+
     supabase.auth.getUser().then(({ data }) => {
       if (mounted) {
         setUser(data.user)
         if (data.user) {
           fetchRole(data.user.id)
+          fetchNotifications(data.user.id)
         } else {
           setIsLoading(false)
         }
@@ -45,6 +63,7 @@ export default function Navbar() {
         setUser(session?.user ?? null)
         if (session?.user) {
           fetchRole(session.user.id)
+          fetchNotifications(session.user.id)
         } else {
           setRole(null)
           setIsLoading(false)
@@ -62,6 +81,31 @@ export default function Navbar() {
     await supabase.auth.signOut()
     router.push('/login')
   }
+
+  const handleToggleNotifications = async () => {
+    const willShow = !showNotifications
+    setShowNotifications(willShow)
+    
+    if (willShow) {
+      const unreadIds = notifications.filter(n => !n.is_read).map(n => n.id)
+      if (unreadIds.length > 0) {
+        try {
+          // Actualizamos optimísticamente la UI
+          setNotifications(prev => prev.map(n => ({ ...n, is_read: true })))
+          
+          // Actualizamos la base de datos
+          await supabase
+            .from('notifications')
+            .update({ is_read: true })
+            .in('id', unreadIds)
+        } catch (err) {
+          console.error('Error marking notifications as read', err)
+        }
+      }
+    }
+  }
+
+  const hasUnread = notifications.some(n => !n.is_read)
 
   return (
     <nav style={{
@@ -110,7 +154,7 @@ export default function Navbar() {
             {/* Notificaciones */}
             <div style={{ position: 'relative' }}>
               <button 
-                onClick={() => setShowNotifications(!showNotifications)}
+                onClick={handleToggleNotifications}
                 style={{
                   background: 'transparent', border: 'none', color: 'var(--t2)', fontSize: '1.2rem',
                   cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -118,10 +162,12 @@ export default function Navbar() {
                 }}
               >
                 🔔
-                <span style={{
-                  position: 'absolute', top: 0, right: 0, width: '8px', height: '8px',
-                  background: 'var(--vocal)', borderRadius: '50%', border: '2px solid rgba(7,9,15,0.96)'
-                }} />
+                {hasUnread && (
+                  <span style={{
+                    position: 'absolute', top: 0, right: 0, width: '8px', height: '8px',
+                    background: 'var(--vocal)', borderRadius: '50%', border: '2px solid rgba(7,9,15,0.96)'
+                  }} />
+                )}
               </button>
               
               {showNotifications && (
@@ -130,19 +176,37 @@ export default function Navbar() {
                   width: '320px', background: 'var(--bg1)', border: '1px solid var(--border)',
                   borderRadius: 'var(--r3)', padding: '8px', boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
                   display: 'flex', flexDirection: 'column', gap: '4px', zIndex: 500,
-                  animation: 'fadeIn 0.2s'
+                  animation: 'fadeIn 0.2s',
+                  maxHeight: '400px', overflowY: 'auto'
                 }}>
                   <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--border)', marginBottom: '4px' }}>
                     <span style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--t1)' }}>Notificaciones</span>
                   </div>
-                  <div style={{ padding: '12px', borderRadius: 'var(--r2)', background: 'var(--bg2)', cursor: 'pointer' }}>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--t1)', fontWeight: 600, marginBottom: '4px' }}>✅ ¡Tu solicitud de mentoría fue aprobada!</p>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--t3)' }}>Hace 2 horas</p>
-                  </div>
-                  <div style={{ padding: '12px', borderRadius: 'var(--r2)', cursor: 'pointer' }}>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--t2)', marginBottom: '4px' }}>💬 Nuevo mensaje de tu productor</p>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--t4)' }}>Hace 5 horas</p>
-                  </div>
+                  {notifications.length === 0 ? (
+                    <div style={{ padding: '16px 12px', textAlign: 'center' }}>
+                      <p style={{ fontSize: '0.85rem', color: 'var(--t3)' }}>No tienes notificaciones</p>
+                    </div>
+                  ) : (
+                    notifications.map(notif => (
+                      <div key={notif.id} style={{ 
+                        padding: '12px', borderRadius: 'var(--r2)', 
+                        background: notif.is_read ? 'transparent' : 'var(--bg2)', 
+                        cursor: 'pointer' 
+                      }}>
+                        <p style={{ 
+                          fontSize: '0.85rem', 
+                          color: notif.is_read ? 'var(--t2)' : 'var(--t1)', 
+                          fontWeight: notif.is_read ? 500 : 600, 
+                          marginBottom: '4px' 
+                        }}>
+                          {notif.content}
+                        </p>
+                        <p style={{ fontSize: '0.7rem', color: 'var(--t4)' }}>
+                          {new Date(notif.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    ))
+                  )}
                 </div>
               )}
             </div>
