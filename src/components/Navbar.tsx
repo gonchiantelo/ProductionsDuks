@@ -101,6 +101,9 @@ export default function Navbar() {
           <Link href="/app/clases" style={navLinkStyle}>
             🎓 Clases
           </Link>
+          <Link href="/app/noticias" style={navLinkStyle}>
+            📰 Noticias
+          </Link>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', paddingLeft: '16px', borderLeft: '1px solid var(--border)', position: 'relative' }}>
             
