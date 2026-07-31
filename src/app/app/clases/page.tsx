@@ -197,32 +197,117 @@ export default function ClasesPage() {
         ) : (
           <div style={{ animation: 'fadeIn 0.3s' }}>
             <div style={{ marginBottom: '32px' }}>
-              <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--t1)', marginBottom: '12px' }}>Mentoria 1 a 1</h2>
+              <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--t1)', marginBottom: '12px' }}>Selecciona a tu Productor</h2>
               <p style={{ fontSize: '0.95rem', color: 'var(--t2)', lineHeight: 1.7, maxWidth: '700px' }}>
-                Resuelve tus dudas en vivo con nuestros productores. Revisaremos tu proyecto directamente de tu DAW (Ableton, FL Studio, Logic Pro), analizaremos tu cadena de señal y te diremos exactamente qué falta para que suene profesional.
+                Aún no tienes un productor asignado. Revisa los perfiles de nuestros expertos y elige al que mejor se adapte a tu estilo y objetivos musicales. Podrás reservar tus mentorías 1 a 1 directamente con él.
               </p>
             </div>
             
-            {/* Placeholder Calendario */}
-            <div style={{
-              width: '100%',
-              minHeight: '400px',
-              border: '2px dashed var(--border)',
-              borderRadius: 'var(--r3)',
-              background: 'rgba(255, 255, 255, 0.02)',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '16px'
-            }}>
-              <span style={{ fontSize: '3rem' }}>📅</span>
-              <p style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--t2)' }}>
-                Widget de Calendario (Próximamente)
-              </p>
-              <p style={{ fontSize: '0.85rem', color: 'var(--t4)' }}>
-                Aquí se integrará el embed de Cal.com
-              </p>
+            {/* Roster de Productores Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
+              
+              {/* Productor 1 */}
+              <div style={{
+                background: 'var(--bg1)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--r3)',
+                padding: '24px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '20px'
+              }}>
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                  <div style={{ 
+                    width: '64px', height: '64px', borderRadius: '50%', 
+                    background: 'var(--vocal2)', border: '2px solid var(--vocal3)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' 
+                  }}>
+                    🎧
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--t1)' }}>Gonzalo</h3>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--vocal)', fontWeight: 600 }}>Especialista en Mezcla Vocal</p>
+                  </div>
+                </div>
+                
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '0.7rem', padding: '4px 10px', background: 'var(--bg2)', borderRadius: '100px', color: 'var(--t2)', fontWeight: 600 }}>Reggaeton</span>
+                  <span style={{ fontSize: '0.7rem', padding: '4px 10px', background: 'var(--bg2)', borderRadius: '100px', color: 'var(--t2)', fontWeight: 600 }}>Trap</span>
+                  <span style={{ fontSize: '0.7rem', padding: '4px 10px', background: 'var(--bg2)', borderRadius: '100px', color: 'var(--t2)', fontWeight: 600 }}>Pop Urbano</span>
+                </div>
+                
+                <p style={{ fontSize: '0.85rem', color: 'var(--t3)', lineHeight: 1.6, flex: 1 }}>
+                  "Mi objetivo es que tus voces suenen claras, potentes y al frente. Trabajaremos en ecualización quirúrgica, compresión armónica y texturas."
+                </p>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: 'auto' }}>
+                  <button onClick={() => alert('Abriendo chat/contacto...')} style={{
+                    padding: '10px', background: 'transparent', border: '1px solid var(--border)', color: 'var(--t1)',
+                    borderRadius: 'var(--r2)', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', transition: 'border-color 0.2s'
+                  }}>
+                    Contactar
+                  </button>
+                  <button style={{
+                    padding: '10px', background: 'var(--vocal)', border: 'none', color: '#fff',
+                    borderRadius: 'var(--r2)', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer',
+                    boxShadow: '0 4px 12px var(--vocal3)'
+                  }}>
+                    Elegir Productor
+                  </button>
+                </div>
+              </div>
+
+              {/* Productor 2 */}
+              <div style={{
+                background: 'var(--bg1)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--r3)',
+                padding: '24px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '20px'
+              }}>
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                  <div style={{ 
+                    width: '64px', height: '64px', borderRadius: '50%', 
+                    background: 'var(--vocal2)', border: '2px solid var(--vocal3)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' 
+                  }}>
+                    🎹
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--t1)' }}>Pato</h3>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--vocal)', fontWeight: 600 }}>Especialista en Mastering</p>
+                  </div>
+                </div>
+                
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '0.7rem', padding: '4px 10px', background: 'var(--bg2)', borderRadius: '100px', color: 'var(--t2)', fontWeight: 600 }}>EDM</span>
+                  <span style={{ fontSize: '0.7rem', padding: '4px 10px', background: 'var(--bg2)', borderRadius: '100px', color: 'var(--t2)', fontWeight: 600 }}>Pop</span>
+                  <span style={{ fontSize: '0.7rem', padding: '4px 10px', background: 'var(--bg2)', borderRadius: '100px', color: 'var(--t2)', fontWeight: 600 }}>Hip Hop</span>
+                </div>
+                
+                <p style={{ fontSize: '0.85rem', color: 'var(--t3)', lineHeight: 1.6, flex: 1 }}>
+                  "Llevo tu mezcla al estándar comercial. Te ayudo a conseguir el loudness perfecto sin sacrificar la dinámica ni el punch original de tu tema."
+                </p>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: 'auto' }}>
+                  <button onClick={() => alert('Abriendo chat/contacto...')} style={{
+                    padding: '10px', background: 'transparent', border: '1px solid var(--border)', color: 'var(--t1)',
+                    borderRadius: 'var(--r2)', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', transition: 'border-color 0.2s'
+                  }}>
+                    Contactar
+                  </button>
+                  <button style={{
+                    padding: '10px', background: 'var(--vocal)', border: 'none', color: '#fff',
+                    borderRadius: 'var(--r2)', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer',
+                    boxShadow: '0 4px 12px var(--vocal3)'
+                  }}>
+                    Elegir Productor
+                  </button>
+                </div>
+              </div>
+
             </div>
           </div>
         )}
