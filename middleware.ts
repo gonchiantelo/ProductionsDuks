@@ -65,18 +65,20 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/app/manual', request.url))
     }
 
-    // Regla B: Proteger rutas /app (Solo suscripción activa o trial vigente)
-    if (isAppRoute && !hasActiveAccess && path !== '/perfil') {
-      // Si se quedó sin acceso, lo mandamos al perfil para que pague (o renueve)
-      return NextResponse.redirect(new URL('/perfil', request.url))
-    }
-    // Regla C: Forzar Onboarding
+    // Regla C: Forzar Onboarding (Mover arriba para evitar race conditions con Regla B)
     const isOnboardingRoute = path === '/app/onboarding'
-    if (!profile?.onboarding_completed && !isOnboardingRoute) {
+    if ((!profile || !profile.onboarding_completed) && !isOnboardingRoute) {
       return NextResponse.redirect(new URL('/app/onboarding', request.url))
     }
     if (profile?.onboarding_completed && isOnboardingRoute) {
       return NextResponse.redirect(new URL('/app/manual', request.url))
+    }
+
+    // Regla B: Proteger rutas /app (Solo suscripción activa o trial vigente)
+    // Se ignora si ya estamos en /app/onboarding porque el onboarding debe ser accesible.
+    if (isAppRoute && !hasActiveAccess && path !== '/perfil' && !isOnboardingRoute) {
+      // Si se quedó sin acceso, lo mandamos al perfil para que pague (o renueve)
+      return NextResponse.redirect(new URL('/perfil', request.url))
     }
   }
 

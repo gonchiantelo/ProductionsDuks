@@ -65,6 +65,9 @@ export default function Navbar() {
         if (session?.user) {
           fetchRole(session.user.id)
           fetchNotifications(session.user.id)
+          if (_event === 'SIGNED_IN') {
+            router.refresh()
+          }
         } else {
           setRole(null)
           setIsLoading(false)
