@@ -14,6 +14,7 @@ export default function OnboardingPage() {
 
   // Form State
   const [formData, setFormData] = useState({
+    display_name: '',
     document_id: '',
     phone_number: '',
     bio: '',
@@ -36,13 +37,16 @@ export default function OnboardingPage() {
     supabase.auth.getUser().then(({ data }) => {
       if (mounted && data.user) {
         setUserId(data.user.id)
-        supabase.from('profiles').select('role, onboarding_completed').eq('id', data.user.id).single()
+        supabase.from('profiles').select('role, onboarding_completed, display_name').eq('id', data.user.id).single()
           .then(({ data: profile }) => {
             if (mounted) {
               if (profile?.onboarding_completed) {
                 router.push('/app/manual')
               } else {
                 setRole(profile?.role || 'alumno')
+                if (profile?.display_name) {
+                  setFormData(prev => ({ ...prev, display_name: profile.display_name }))
+                }
                 setIsLoading(false)
               }
             }
@@ -80,6 +84,7 @@ export default function OnboardingPage() {
       const { error: updateError } = await supabase
         .from('profiles')
         .update({
+          display_name: formData.display_name,
           document_id: formData.document_id,
           phone_number: formData.phone_number,
           bio: formData.bio,
@@ -142,6 +147,15 @@ export default function OnboardingPage() {
             <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--t1)', marginBottom: '16px', borderBottom: '1px solid var(--border)', paddingBottom: '8px' }}>
               Datos Generales
             </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+              <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--t2)' }}>Nombre Completo</label>
+              <input 
+                type="text" required
+                value={formData.display_name} onChange={e => setFormData({...formData, display_name: e.target.value})}
+                style={inputStyle}
+                placeholder="Ej: Gonzalo Antelo"
+              />
+            </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--t2)' }}>Cédula / DNI</label>
@@ -237,25 +251,35 @@ export default function OnboardingPage() {
             )}
           </div>
 
-          <button 
-            type="submit" 
-            disabled={isSubmitting}
-            style={{
-              padding: '14px',
-              background: 'var(--vocal)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 'var(--r2)',
-              fontSize: '1rem',
-              fontWeight: 800,
-              cursor: isSubmitting ? 'not-allowed' : 'pointer',
-              opacity: isSubmitting ? 0.7 : 1,
-              marginTop: '16px',
-              transition: 'opacity 0.2s'
-            }}
-          >
-            {isSubmitting ? 'Guardando...' : 'Comenzar'}
-          </button>
+          {(() => {
+            const isBaseValid = formData.display_name.trim() !== '' && formData.document_id.trim() !== '' && formData.phone_number.trim() !== '' && formData.bio.trim() !== '';
+            const isRoleValid = role === 'productor' 
+              ? formData.software.length > 0 && formData.specialties.length > 0 
+              : formData.genres.length > 0;
+            const isFormValid = isBaseValid && isRoleValid;
+
+            return (
+              <button 
+                type="submit" 
+                disabled={!isFormValid || isSubmitting}
+                style={{
+                  padding: '14px',
+                  background: 'var(--vocal)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 'var(--r2)',
+                  fontSize: '1rem',
+                  fontWeight: 800,
+                  cursor: (!isFormValid || isSubmitting) ? 'not-allowed' : 'pointer',
+                  opacity: (!isFormValid || isSubmitting) ? 0.4 : 1,
+                  marginTop: '16px',
+                  transition: 'opacity 0.2s'
+                }}
+              >
+                {isSubmitting ? 'Guardando...' : 'Comenzar'}
+              </button>
+            )
+          })()}
 
         </form>
       </div>
