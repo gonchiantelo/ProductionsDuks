@@ -73,7 +73,7 @@
 
 ### 4.2 — Gestión de Clases
 - [ ] Listado de clases con filtro por Roadmap/Nivel y estado (publicada/borrador).
-- [ ] Formulario para crear/editar clase:
+- [x] Formulario para crear/editar clase:
   - Título, descripción (rich text simple).
   - URL del video (Vimeo o YouTube Oculto — sin subir archivos de video al servidor).
   - Asignación a etapa del Roadmap y orden de aparición.
