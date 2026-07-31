@@ -11,6 +11,7 @@ export default function Navbar() {
   const [user, setUser] = useState<User | null>(null)
   const [role, setRole] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [showNotifications, setShowNotifications] = useState(false)
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -101,7 +102,48 @@ export default function Navbar() {
             🎓 Clases
           </Link>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', paddingLeft: '16px', borderLeft: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', paddingLeft: '16px', borderLeft: '1px solid var(--border)', position: 'relative' }}>
+            
+            {/* Notificaciones */}
+            <div style={{ position: 'relative' }}>
+              <button 
+                onClick={() => setShowNotifications(!showNotifications)}
+                style={{
+                  background: 'transparent', border: 'none', color: 'var(--t2)', fontSize: '1.2rem',
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  padding: '4px'
+                }}
+              >
+                🔔
+                <span style={{
+                  position: 'absolute', top: 0, right: 0, width: '8px', height: '8px',
+                  background: 'var(--vocal)', borderRadius: '50%', border: '2px solid rgba(7,9,15,0.96)'
+                }} />
+              </button>
+              
+              {showNotifications && (
+                <div style={{
+                  position: 'absolute', top: '100%', right: '0', marginTop: '12px',
+                  width: '320px', background: 'var(--bg1)', border: '1px solid var(--border)',
+                  borderRadius: 'var(--r3)', padding: '8px', boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                  display: 'flex', flexDirection: 'column', gap: '4px', zIndex: 500,
+                  animation: 'fadeIn 0.2s'
+                }}>
+                  <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--border)', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--t1)' }}>Notificaciones</span>
+                  </div>
+                  <div style={{ padding: '12px', borderRadius: 'var(--r2)', background: 'var(--bg2)', cursor: 'pointer' }}>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--t1)', fontWeight: 600, marginBottom: '4px' }}>✅ ¡Tu solicitud de mentoría fue aprobada!</p>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--t3)' }}>Hace 2 horas</p>
+                  </div>
+                  <div style={{ padding: '12px', borderRadius: 'var(--r2)', cursor: 'pointer' }}>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--t2)', marginBottom: '4px' }}>💬 Nuevo mensaje de tu productor</p>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--t4)' }}>Hace 5 horas</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <span style={{ fontSize: '0.75rem', color: 'var(--t3)', display: 'flex', alignItems: 'center', gap: '6px' }}>
               {user.email}
               <span style={{ 

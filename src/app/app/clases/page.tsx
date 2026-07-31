@@ -10,6 +10,7 @@ const PRODUCERS = [
 export default function ClasesPage() {
   const [activeTab, setActiveTab] = useState<'grabadas' | 'particulares'>('grabadas')
   const [requestStatus, setRequestStatus] = useState<'idle' | 'pending' | 'approved'>('idle')
+  const [isMatched, setIsMatched] = useState(false)
   const [selectedProducer, setSelectedProducer] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -23,16 +24,27 @@ export default function ClasesPage() {
     setRequestStatus('pending')
   }
 
+  // Obtenemos el productor asignado si está en estado matched (por defecto el primero o el que se haya seleccionado si venimos de pending)
+  const assignedProducer = PRODUCERS.find(p => p.id === selectedProducer) || PRODUCERS[0]
+
   return (
     <div style={{ flex: 1, padding: '40px 48px', maxWidth: '1040px', margin: '0 auto', width: '100%', position: 'relative' }}>
       
-      {/* ── Test Button (Hidden/Discreet) ── */}
-      <button 
-        onClick={() => setRequestStatus(prev => prev === 'approved' ? 'idle' : 'approved')}
-        style={{ position: 'absolute', top: '10px', right: '10px', opacity: 0.1, fontSize: '0.6rem', cursor: 'pointer' }}
-      >
-        Toggle Approved Test
-      </button>
+      {/* ── Test Buttons (Hidden/Discreet) ── */}
+      <div style={{ position: 'absolute', top: '10px', right: '10px', display: 'flex', gap: '8px', opacity: 0.1 }}>
+        <button 
+          onClick={() => setRequestStatus(prev => prev === 'approved' ? 'idle' : 'approved')}
+          style={{ fontSize: '0.6rem', cursor: 'pointer' }}
+        >
+          Toggle Paywall Test
+        </button>
+        <button 
+          onClick={() => setIsMatched(!isMatched)}
+          style={{ fontSize: '0.6rem', cursor: 'pointer' }}
+        >
+          Toggle Matched Test
+        </button>
+      </div>
 
       {/* ── Header ── */}
       <div style={{ marginBottom: '40px' }}>
@@ -221,6 +233,67 @@ export default function ClasesPage() {
               <div style={{ width: '100%', height: '100%', background: 'var(--bg2)', display: 'grid', gridTemplateColumns: '1fr 3fr', gap: '1px', opacity: 0.2 }}>
                 <div style={{ background: 'var(--bg1)' }}></div>
                 <div style={{ background: 'var(--bg1)' }}></div>
+              </div>
+            </div>
+          </div>
+        ) : isMatched ? (
+          <div style={{ animation: 'fadeIn 0.3s' }}>
+            <div style={{ marginBottom: '32px' }}>
+              <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--t1)', marginBottom: '12px' }}>Tu Productor Asignado</h2>
+              <p style={{ fontSize: '0.95rem', color: 'var(--t2)', lineHeight: 1.7, maxWidth: '700px' }}>
+                ¡Ya tienes un mentor exclusivo! Coordina directamente con él para resolver tus dudas y agendar las revisiones de tus proyectos.
+              </p>
+            </div>
+            
+            <div style={{
+              background: 'var(--bg1)',
+              border: '2px solid var(--border)',
+              borderRadius: 'var(--r3)',
+              padding: '32px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '24px',
+              maxWidth: '600px',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              {/* Glow background sutil */}
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'var(--vocal)', opacity: 0.8 }} />
+
+              <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+                <div style={{ 
+                  width: '80px', height: '80px', borderRadius: '50%', 
+                  background: 'var(--vocal2)', border: '2px solid var(--vocal3)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem' 
+                }}>
+                  {assignedProducer.icon}
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--t1)', marginBottom: '4px' }}>{assignedProducer.name}</h3>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--vocal)', fontWeight: 600 }}>{assignedProducer.role}</p>
+                </div>
+              </div>
+              
+              <div style={{ background: 'var(--bg2)', padding: '20px', borderRadius: 'var(--r2)', border: '1px solid var(--border)' }}>
+                <p style={{ fontSize: '0.95rem', color: 'var(--t2)', lineHeight: 1.6, fontStyle: 'italic' }}>
+                  {assignedProducer.quote}
+                </p>
+              </div>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '8px' }}>
+                <button onClick={() => alert('Abriendo Calendario...')} style={{
+                  padding: '12px', background: 'var(--vocal)', border: 'none', color: '#fff',
+                  borderRadius: 'var(--r2)', fontWeight: 700, fontSize: '0.95rem', cursor: 'pointer',
+                  boxShadow: '0 4px 12px var(--vocal3)'
+                }}>
+                  Ir al Calendario de Reservas
+                </button>
+                <button onClick={() => alert('Abriendo chat directo...')} style={{
+                  padding: '12px', background: 'transparent', border: '2px solid var(--border)', color: 'var(--t1)',
+                  borderRadius: 'var(--r2)', fontWeight: 700, fontSize: '0.95rem', cursor: 'pointer', transition: 'border-color 0.2s'
+                }}>
+                  Enviar Mensaje
+                </button>
               </div>
             </div>
           </div>
