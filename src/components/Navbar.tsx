@@ -13,6 +13,7 @@ export default function Navbar() {
   const [role, setRole] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [showNotifications, setShowNotifications] = useState(false)
+  const [showUserMenu, setShowUserMenu] = useState(false)
   const [notifications, setNotifications] = useState<any[]>([])
 
   const supabase = createBrowserClient(
@@ -154,9 +155,6 @@ export default function Navbar() {
           <Link href="/app/noticias" style={navLinkStyle}>
             📰 Noticias
           </Link>
-          <Link href="/app/perfil" style={navLinkStyle}>
-            👤 Mi Perfil
-          </Link>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', paddingLeft: '16px', borderLeft: '1px solid var(--border)', position: 'relative' }}>
             
@@ -220,24 +218,62 @@ export default function Navbar() {
               )}
             </div>
 
-            <span style={{ fontSize: '0.75rem', color: 'var(--t3)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              {user.email}
-              <span style={{ 
-                color: role === 'productor' ? 'var(--vocal)' : 'var(--t2)', 
-                fontWeight: 700,
-                backgroundColor: 'var(--bg2)',
-                padding: '2px 6px',
-                borderRadius: '4px',
-                fontSize: '0.65rem',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em'
-              }}>
-                {role === 'productor' ? 'Productor' : 'Alumno'}
-              </span>
-            </span>
-            <button onClick={handleLogout} style={logoutBtnStyle}>
-              Cerrar Sesión
-            </button>
+            {/* Menú de Usuario */}
+            <div style={{ position: 'relative' }}>
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                style={{
+                  background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', padding: '4px', outline: 'none'
+                }}
+              >
+                <span style={{ fontSize: '0.75rem', color: 'var(--t3)' }}>
+                  {user.email}
+                </span>
+                <span style={{ 
+                  color: role === 'productor' ? 'var(--vocal)' : 'var(--t2)', 
+                  fontWeight: 700,
+                  backgroundColor: 'var(--bg2)',
+                  padding: '2px 6px',
+                  borderRadius: '4px',
+                  fontSize: '0.65rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
+                  {role === 'productor' ? 'Productor' : 'Alumno'}
+                </span>
+                <span style={{ fontSize: '0.6rem', color: 'var(--t4)', marginLeft: '4px' }}>▼</span>
+              </button>
+
+              {showUserMenu && (
+                <div style={{
+                  position: 'absolute', top: '100%', right: '0', marginTop: '12px',
+                  width: '240px', background: 'var(--bg1)', border: '1px solid var(--border)',
+                  borderRadius: 'var(--r3)', padding: '8px', boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                  display: 'flex', flexDirection: 'column', gap: '4px', zIndex: 500,
+                  animation: 'fadeIn 0.2s'
+                }}>
+                  <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--border)', marginBottom: '4px', display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--t1)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</span>
+                  </div>
+                  
+                  <Link href="/app/perfil" onClick={() => setShowUserMenu(false)} style={{
+                    padding: '10px 12px', fontSize: '0.85rem', color: 'var(--t2)', textDecoration: 'none', 
+                    borderRadius: 'var(--r2)', transition: 'background 0.2s', display: 'flex', alignItems: 'center', gap: '8px'
+                  }}>
+                    ⚙️ Mi Configuración / Perfil
+                  </Link>
+
+                  <div style={{ height: '1px', background: 'var(--border)', margin: '4px 0' }} />
+
+                  <button onClick={() => { setShowUserMenu(false); handleLogout(); }} style={{
+                    padding: '10px 12px', fontSize: '0.85rem', color: '#eb4e37', background: 'transparent', border: 'none',
+                    borderRadius: 'var(--r2)', cursor: 'pointer', textAlign: 'left', fontWeight: 600, transition: 'background 0.2s'
+                  }}>
+                    Cerrar Sesión
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       ) : (

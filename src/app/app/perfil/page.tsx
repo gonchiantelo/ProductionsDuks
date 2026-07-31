@@ -16,6 +16,7 @@ export default function PerfilPage() {
   // Form State
   const [formData, setFormData] = useState({
     display_name: '',
+    email: '',
     document_id: '',
     phone_number: '',
     bio: '',
@@ -44,6 +45,7 @@ export default function PerfilPage() {
               setRole(profile?.role || 'alumno')
               setFormData({
                 display_name: profile?.display_name || '',
+                email: data.user?.email || '',
                 document_id: profile?.document_id || '',
                 phone_number: profile?.phone_number || '',
                 bio: profile?.bio || '',
@@ -159,14 +161,24 @@ export default function PerfilPage() {
             <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--t1)', marginBottom: '16px', borderBottom: '1px solid var(--border)', paddingBottom: '8px' }}>
               Datos Generales
             </h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
-              <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--t2)' }}>Nombre Completo</label>
-              <input 
-                type="text" required
-                value={formData.display_name} onChange={e => setFormData({...formData, display_name: e.target.value})}
-                style={inputStyle}
-                placeholder="Ej: Gonzalo Antelo"
-              />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--t2)' }}>Nombre Completo</label>
+                <input 
+                  type="text" required
+                  value={formData.display_name} onChange={e => setFormData({...formData, display_name: e.target.value})}
+                  style={inputStyle}
+                  placeholder="Ej: Gonzalo Antelo"
+                />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--t2)' }}>Email</label>
+                <input 
+                  type="email" disabled
+                  value={formData.email}
+                  style={{ ...inputStyle, opacity: 0.6, cursor: 'not-allowed' }}
+                />
+              </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
