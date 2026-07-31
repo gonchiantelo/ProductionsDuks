@@ -97,6 +97,9 @@ export default function Navbar() {
           <Link href="/app/manual" style={navLinkStyle}>
             📖 Manual
           </Link>
+          <Link href="/app/clases" style={navLinkStyle}>
+            🎓 Clases
+          </Link>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', paddingLeft: '16px', borderLeft: '1px solid var(--border)' }}>
             <span style={{ fontSize: '0.75rem', color: 'var(--t3)', display: 'flex', alignItems: 'center', gap: '6px' }}>
