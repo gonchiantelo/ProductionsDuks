@@ -11,6 +11,7 @@ export default function OnboardingPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [nameColumn, setNameColumn] = useState<string>('display_name')
 
   // Form State
   const [formData, setFormData] = useState({
@@ -37,15 +38,21 @@ export default function OnboardingPage() {
     supabase.auth.getUser().then(({ data }) => {
       if (mounted && data.user) {
         setUserId(data.user.id)
-        supabase.from('profiles').select('role, onboarding_completed, display_name').eq('id', data.user.id).single()
+        supabase.from('profiles').select('*').eq('id', data.user.id).single()
           .then(({ data: profile }) => {
             if (mounted) {
               if (profile?.onboarding_completed) {
                 router.push('/app/manual')
               } else {
+                let detectedNameCol = 'display_name';
+                if (profile && 'full_name' in profile) detectedNameCol = 'full_name';
+                else if (profile && 'name' in profile) detectedNameCol = 'name';
+                setNameColumn(detectedNameCol);
+
                 setRole(profile?.role || 'alumno')
-                if (profile?.display_name) {
-                  setFormData(prev => ({ ...prev, display_name: profile.display_name }))
+                const loadedName = profile?.full_name || profile?.name || profile?.display_name || '';
+                if (loadedName) {
+                  setFormData(prev => ({ ...prev, display_name: loadedName }))
                 }
                 setIsLoading(false)
               }
@@ -81,18 +88,21 @@ export default function OnboardingPage() {
     setError('')
 
     try {
+      const updatePayload: any = {
+        document_id: formData.document_id,
+        phone_number: formData.phone_number,
+        bio: formData.bio,
+        software: role === 'productor' ? formData.software : null,
+        specialties: role === 'productor' ? formData.specialties : null,
+        genres: role === 'alumno' ? formData.genres : null,
+        onboarding_completed: true
+      };
+      
+      updatePayload[nameColumn] = formData.display_name;
+
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({
-          display_name: formData.display_name,
-          document_id: formData.document_id,
-          phone_number: formData.phone_number,
-          bio: formData.bio,
-          software: role === 'productor' ? formData.software : null,
-          specialties: role === 'productor' ? formData.specialties : null,
-          genres: role === 'alumno' ? formData.genres : null,
-          onboarding_completed: true
-        })
+        .update(updatePayload)
         .eq('id', userId)
 
       if (updateError) throw updateError

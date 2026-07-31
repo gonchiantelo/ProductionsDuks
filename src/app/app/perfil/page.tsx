@@ -12,6 +12,7 @@ export default function PerfilPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
+  const [nameColumn, setNameColumn] = useState<string>('display_name')
 
   // Form State
   const [formData, setFormData] = useState({
@@ -42,9 +43,14 @@ export default function PerfilPage() {
         supabase.from('profiles').select('*').eq('id', data.user.id).single()
           .then(({ data: profile }) => {
             if (mounted) {
+              let detectedNameCol = 'display_name';
+              if (profile && 'full_name' in profile) detectedNameCol = 'full_name';
+              else if (profile && 'name' in profile) detectedNameCol = 'name';
+              setNameColumn(detectedNameCol);
+              
               setRole(profile?.role || 'alumno')
               setFormData({
-                display_name: profile?.display_name || '',
+                display_name: profile?.full_name || profile?.name || profile?.display_name || '',
                 email: data.user?.email || '',
                 document_id: profile?.document_id || '',
                 phone_number: profile?.phone_number || '',
@@ -86,18 +92,21 @@ export default function PerfilPage() {
     setError('')
 
     try {
+      const updatePayload: any = {
+        document_id: formData.document_id,
+        phone_number: formData.phone_number,
+        bio: formData.bio,
+        software: role === 'productor' ? formData.software : null,
+        specialties: role === 'productor' ? formData.specialties : null,
+        genres: role === 'alumno' ? formData.genres : null,
+        onboarding_completed: true
+      };
+      
+      updatePayload[nameColumn] = formData.display_name;
+      
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({
-          display_name: formData.display_name,
-          document_id: formData.document_id,
-          phone_number: formData.phone_number,
-          bio: formData.bio,
-          software: role === 'productor' ? formData.software : null,
-          specialties: role === 'productor' ? formData.specialties : null,
-          genres: role === 'alumno' ? formData.genres : null,
-          onboarding_completed: true
-        })
+        .update(updatePayload)
         .eq('id', userId)
 
       if (updateError) throw updateError
