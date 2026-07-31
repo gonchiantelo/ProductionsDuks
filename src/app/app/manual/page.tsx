@@ -18,13 +18,13 @@ export default function ManualPage() {
   const [activeTab, setActiveTab] = useState('panel-glosario')
 
   return (
-    <div style={{ display: 'flex', minHeight: 'calc(100vh - 54px)' }}>
+    <div style={{ display: 'flex', height: '100%' }}>
 
       {/* ── Sidebar ── */}
       <aside style={{
         width: '240px', flexShrink: 0,
-        position: 'sticky', top: '54px', alignSelf: 'flex-start',
-        height: 'calc(100vh - 54px)', overflowY: 'auto',
+        alignSelf: 'flex-start',
+        height: '100%', overflowY: 'auto',
         borderRight: '1px solid var(--border)',
         background: 'var(--bg1)',
         padding: '24px 0'

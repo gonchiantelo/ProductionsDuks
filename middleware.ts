@@ -72,8 +72,8 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 5. Si es auth route y ya está logueado, mandarlo a la app
-  if (user && isAuthRoute) {
+  // 5. Si es auth route o la landing y ya está logueado, mandarlo a la app
+  if (user && (isAuthRoute || path === '/')) {
     return NextResponse.redirect(new URL('/app/manual', request.url))
   }
 

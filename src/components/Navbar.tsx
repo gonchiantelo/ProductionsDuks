@@ -72,7 +72,7 @@ export default function Navbar() {
       borderBottom: '1px solid var(--border)'
     }}>
       {/* Logo */}
-      <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+      <Link href={user ? "/app/manual" : "/"} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
         <span style={{ fontSize: '0.85rem', fontWeight: 800, letterSpacing: '-0.01em', color: 'var(--t1)' }}>
           Productions<em style={{ color: 'var(--vocal)', fontStyle: 'normal' }}>Duks</em>
         </span>
