@@ -10,6 +10,7 @@ export default function Navbar() {
   const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
   const [role, setRole] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -17,20 +18,43 @@ export default function Navbar() {
   )
 
   useEffect(() => {
+    let mounted = true
+
+    const fetchRole = async (userId: string) => {
+      const { data } = await supabase.from('profiles').select('role').eq('id', userId).single()
+      if (mounted) {
+        setRole(data?.role ?? null)
+        setIsLoading(false)
+      }
+    }
+
     supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user)
-      if (data.user) {
-        supabase.from('profiles').select('role').eq('id', data.user.id).single().then(({ data: p }) => {
-          setRole(p?.role ?? null)
-        })
+      if (mounted) {
+        setUser(data.user)
+        if (data.user) {
+          fetchRole(data.user.id)
+        } else {
+          setIsLoading(false)
+        }
       }
     })
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-      if (!session?.user) setRole(null)
+      if (mounted) {
+        setUser(session?.user ?? null)
+        if (session?.user) {
+          fetchRole(session.user.id)
+        } else {
+          setRole(null)
+          setIsLoading(false)
+        }
+      }
     })
-    return () => listener.subscription.unsubscribe()
+
+    return () => {
+      mounted = false
+      listener.subscription.unsubscribe()
+    }
   }, [])
 
   const handleLogout = async () => {
@@ -58,8 +82,13 @@ export default function Navbar() {
       <div style={{ flex: 1 }} />
 
       {/* Links según sesión */}
-      {user ? (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      {isLoading ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: 0.5 }}>
+          <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '2px solid var(--t4)', borderTopColor: 'var(--vocal)', animation: 'spin 1s linear infinite' }} />
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      ) : user ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           {role === 'productor' && (
             <Link href="/admin" style={navLinkStyle}>
               🛠️ Admin
@@ -68,9 +97,27 @@ export default function Navbar() {
           <Link href="/app/manual" style={navLinkStyle}>
             📖 Manual
           </Link>
-          <button onClick={handleLogout} style={logoutBtnStyle}>
-            Cerrar Sesión
-          </button>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', paddingLeft: '16px', borderLeft: '1px solid var(--border)' }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--t3)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              {user.email}
+              <span style={{ 
+                color: role === 'productor' ? 'var(--vocal)' : 'var(--t2)', 
+                fontWeight: 700,
+                backgroundColor: 'var(--bg2)',
+                padding: '2px 6px',
+                borderRadius: '4px',
+                fontSize: '0.65rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}>
+                {role === 'productor' ? 'Productor' : 'Alumno'}
+              </span>
+            </span>
+            <button onClick={handleLogout} style={logoutBtnStyle}>
+              Cerrar Sesión
+            </button>
+          </div>
         </div>
       ) : (
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
