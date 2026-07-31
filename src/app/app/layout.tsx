@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 54px)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 54px)' }}>
       {/* Banner de Trial */}
       <div style={{
         flexShrink: 0,
@@ -27,8 +27,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </Link>
       </div>
 
-      {/* Main Area */}
-      <div style={{ flex: 1, overflow: 'hidden' }}>
+      <div style={{ flex: 1 }}>
         {children}
       </div>
     </div>
