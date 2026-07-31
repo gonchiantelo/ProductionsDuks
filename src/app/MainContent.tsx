@@ -1,6 +1,6 @@
 export default function MainContent() {
   return (
-    <main className="main" dangerouslySetInnerHTML={{ __html: `
+    <div dangerouslySetInnerHTML={{ __html: `
 
     <!-- ═══ GLOSARIO ═══ -->
     <div class="tab-panel active" id="panel-glosario">
@@ -34,7 +34,7 @@ export default function MainContent() {
     </div>
 
     <!-- ═══ MENTALIDAD ═══ -->
-    <div class="tab-panel" id="panel-mentalidad">
+    <div class="tab-panel active" id="panel-mentalidad">
       <div class="panel-hero">
         <h1>🧠 Mentalidad y Criterios</h1>
         <p>Cómo pensar cuando mezclás. Los errores mentales arruinan más mezclas que la falta de plugins.</p>
@@ -81,7 +81,7 @@ export default function MainContent() {
     </div>
 
     <!-- ═══ DIAGNOSTICO ═══ -->
-    <div class="tab-panel" id="panel-diagnostico">
+    <div class="tab-panel active" id="panel-diagnostico">
       <div class="panel-hero">
         <h1>🔧 Diagnóstico Auditivo</h1>
         <p>Si escuchás esto, hacé esto. Cada problema tiene un culpable específico y una corrección concreta.</p>
@@ -177,7 +177,7 @@ export default function MainContent() {
     </div>
 
     <!-- ═══ CADENA ═══ -->
-    <div class="tab-panel" id="panel-cadena">
+    <div class="tab-panel active" id="panel-cadena">
       <div class="panel-hero">
         <h1>🔗 Cadena de Señal</h1>
         <p>El orden correcto de los plugins en cada canal. Este orden no es arbitrario — cada plugin trabaja sobre lo que le llega del anterior.</p>
@@ -221,7 +221,7 @@ export default function MainContent() {
     </div>
 
     <!-- ═══ VOCAL ═══ -->
-    <div class="tab-panel" id="panel-vocal">
+    <div class="tab-panel active" id="panel-vocal">
       <div class="panel-hero">
         <h1>🎤 Canal Vocal</h1>
         <p>Melodyne, Autotune, EQ, Gate, De-esser, Compresor, Saturación, Reverb y Delay — todos explicados en detalle.</p>
@@ -544,7 +544,7 @@ export default function MainContent() {
     </div>
 
     <!-- ═══ BEAT ═══ -->
-    <div class="tab-panel" id="panel-beat">
+    <div class="tab-panel active" id="panel-beat">
       <div class="panel-hero">
         <h1>🎵 Canal Beat</h1>
         <p>Beat descargado de internet — cómo prepararlo, ecualizarlo y hacerle espacio para que la voz respire.</p>
@@ -610,7 +610,7 @@ export default function MainContent() {
     </div>
 
     <!-- ═══ MASTER ═══ -->
-    <div class="tab-panel" id="panel-master">
+    <div class="tab-panel active" id="panel-master">
       <div class="panel-hero">
         <h1>🎚️ Canal Master</h1>
         <p>La mezcla final (Stereo Out) — EQ Master, Glue Compressor, Stereo Imager y Limiter. El orden importa.</p>
@@ -680,7 +680,7 @@ export default function MainContent() {
     </div>
 
     <!-- ═══ POR GÉNERO ═══ -->
-    <div class="tab-panel" id="panel-generos">
+    <div class="tab-panel active" id="panel-generos">
       <div class="panel-hero">
         <h1>🎸 Configuración por Género</h1>
         <p>Valores específicos para cada estilo. Seleccioná el género en la barra superior para actualizar todos los valores del manual.</p>
