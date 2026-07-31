@@ -12,11 +12,11 @@ export async function login(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword({ email, password })
 
   if (error) {
-    redirect('/login?error=Correo o contraseña incorrectos')
+    redirect('/login?error=' + encodeURIComponent(error.message))
   }
 
   revalidatePath('/', 'layout')
-  redirect('/app/roadmap')
+  redirect('/app/manual')
 }
 
 export async function signup(formData: FormData) {
@@ -34,9 +34,10 @@ export async function signup(formData: FormData) {
   })
 
   if (error) {
-    redirect('/register?error=Error al registrar la cuenta')
+    console.error("DETALLE DEL ERROR:", error)
+    redirect('/register?error=' + encodeURIComponent(error.message))
   }
 
   revalidatePath('/', 'layout')
-  redirect('/app/roadmap')
+  redirect('/app/manual')
 }

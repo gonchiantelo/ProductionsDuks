@@ -31,7 +31,7 @@ export default function AdminPage() {
       {/* Panel lateral provisional o padding general */}
       <div style={{ flex: 1, padding: '40px', maxWidth: '800px', margin: '0 auto' }}>
         <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '10px' }}>🛠️ Panel del Productor</h1>
-        <p style={{ color: 'var(--t2)', marginBottom: '30px' }}>Administra las clases y el contenido del roadmap.</p>
+        <p style={{ color: 'var(--t2)', marginBottom: '30px' }}>Administra las clases y el contenido del manual.</p>
         
         <div style={{ backgroundColor: 'var(--bg1)', padding: '30px', borderRadius: 'var(--r3)', border: '1px solid var(--border)' }}>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--vocal)', marginBottom: '20px' }}>Subir Nueva Clase</h2>

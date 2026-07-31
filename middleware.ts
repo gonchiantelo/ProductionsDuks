@@ -62,7 +62,7 @@ export async function middleware(request: NextRequest) {
 
     // Regla A: Proteger rutas /admin (Solo Productor)
     if (isAdminRoute && !isProductor) {
-      return NextResponse.redirect(new URL('/app/roadmap', request.url))
+      return NextResponse.redirect(new URL('/app/manual', request.url))
     }
 
     // Regla B: Proteger rutas /app (Solo suscripción activa o trial vigente)
@@ -74,7 +74,7 @@ export async function middleware(request: NextRequest) {
 
   // 5. Si es auth route y ya está logueado, mandarlo a la app
   if (user && isAuthRoute) {
-    return NextResponse.redirect(new URL('/app/roadmap', request.url))
+    return NextResponse.redirect(new URL('/app/manual', request.url))
   }
 
   return supabaseResponse

@@ -10,7 +10,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "ProductionsDuks – Plataforma de Mezcla Vocal",
-  description: "Aprende a mezclar voces de forma profesional con nuestro roadmap interactivo y clases en video.",
+  description: "Aprende a mezclar voces de forma profesional con nuestro manual interactivo y clases en video.",
 };
 
 export default function RootLayout({

@@ -65,8 +65,8 @@ export default function Navbar() {
               🛠️ Admin
             </Link>
           )}
-          <Link href="/app/roadmap" style={navLinkStyle}>
-            🗺️ Roadmap
+          <Link href="/app/manual" style={navLinkStyle}>
+            📖 Manual
           </Link>
           <button onClick={handleLogout} style={logoutBtnStyle}>
             Cerrar Sesión
