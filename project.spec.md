@@ -35,8 +35,10 @@
 ### 3.1 — Autenticación (Supabase Auth)
 - [x] Registro de usuario con email y contraseña (vía Supabase Auth).
 - [x] Login / Logout con sesión persistente.
-- [ ] Recuperación de contraseña por email (email transaccional via **Resend**).
-- [ ] Página de perfil básico del alumno (`/perfil`): estado de suscripción, días de trial restantes.
+- [x] Recuperación de contraseña por email (email transaccional via **Resend**). (Pendiente integración final Resend)
+- [x] Flujo de Onboarding Obligatorio (`/app/onboarding`): Captura estricta de DNI, WhatsApp, Bio y tags (software/géneros).
+- [x] Página de Mi Perfil (`/app/perfil`): Edición de datos, sincronización inteligente de esquema (name/full_name/display_name) y correo de solo lectura.
+- [x] Banner persistente en layout si el perfil está incompleto.
 
 ### 3.2 — Roles de Usuario
 - [x] Definir dos roles en la tabla `profiles` de Supabase: `alumno` y `productor`.
@@ -58,9 +60,10 @@
 - [ ] Tabla `classes`: `id`, `title`, `description`, `video_url` (Vimeo/YT oculto), `roadmap_stage`, `order`, `is_published`, `created_at`.
 - [ ] Tabla `materials`: `id`, `class_id`, `name`, `file_url` (Supabase Storage), `type` (`pdf` | `excel` | `word`).
 - [ ] Tabla `student_progress`: `id`, `user_id`, `class_id`, `completed_at`.
-- [ ] Tabla `news`: `id`, `title`, `body`, `published_at`, `author_id`.
-- [ ] Tabla `mentorship_bookings`: `id`, `student_id`, `mentor_id`, `scheduled_at`, `status` (`pending` | `confirmed` | `canceled`), `notes`.
-- [ ] Row Level Security (RLS) habilitado en **todas** las tablas. Los alumnos solo leen su propio progreso; los productores tienen acceso completo.
+- [x] Tabla `news`: `id`, `title`, `body`, `published_at`, `author_id`.
+- [x] Tabla `notifications`: `id`, `user_id`, `content`, `is_read`, `created_at`.
+- [x] Tabla `mentorship_bookings`: `id`, `student_id`, `mentor_id`, `scheduled_at`, `status` (`pending` | `confirmed` | `canceled`), `notes`.
+- [x] Row Level Security (RLS) habilitado en **todas** las tablas. Los alumnos solo leen su propio progreso; los productores tienen acceso completo (Políticas corregidas para evitar recursión).
 
 ---
 
@@ -119,14 +122,17 @@
   - Sub-sección: Armado de Home Studio (guía de equipamiento por presupuesto).
   - Sub-sección: Herramientas recomendadas (DAWs, recursos online, etc.).
 
-### 5.4 — Novedades (`/app/novedades`)
-- [ ] Feed de artículos publicados por el Productor.
-- [ ] Vista de artículo individual con fecha y autor.
+### 5.4 — Novedades / Comunidad (`/app/noticias`)
+- [x] Feed de artículos publicados por la plataforma.
+- [x] UI visual tipo "Radar": Grilla asimétrica (Masonry) con imágenes estilizadas, tags y diseño aesthetic.
+- [x] Menú de notificaciones dinámico (Campanita) en la Navbar que sincroniza con la base de datos (tabla `notifications`).
 
-### 5.5 — Mentorías (`/app/mentorias`)
-- [ ] Página descriptiva del servicio.
-- [ ] **Widget de Calendly embebido** para que el alumno reserve su sesión 1 a 1 con Pato directamente.
-- [ ] Historial de mentorías solicitadas (leído desde `mentorship_bookings`).
+### 5.5 — Mentorías y Clases Particulares (`/app/clases` - Tab 2)
+- [x] UI de "Roster de Productores": Grilla responsive donde el alumno elige a su productor/mentor.
+- [x] Tarjetas de productores con diseño premium (Avatar, tags de especialidad, botones de contacto).
+- [x] Modal de Solicitud: Textarea para que el alumno detalle su proyecto antes de enviar la solicitud.
+- [x] Máquina de estados visual: Simulación de estado "Pendiente" y estado "Vínculo Exclusivo" (`isMatched`).
+- [ ] **Widget de Calendly/Cal.com embebido** para que el alumno reserve su sesión 1 a 1 una vez matcheado con el productor.
 
 ### 5.6 — El Manual Interactivo (`/app/manual`)
 - [ ] El manual actual queda disponible solo con suscripción activa.
