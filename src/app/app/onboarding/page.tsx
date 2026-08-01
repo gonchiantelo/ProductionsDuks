@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
 
@@ -9,6 +9,7 @@ export default function OnboardingPage() {
   const [userId, setUserId] = useState<string | null>(null)
   const [role, setRole] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [nameColumn, setNameColumn] = useState<string>('display_name')
@@ -33,37 +34,73 @@ export default function OnboardingPage() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
 
-  useEffect(() => {
-    let mounted = true
-    supabase.auth.getUser().then(({ data }) => {
-      if (mounted && data.user) {
-        setUserId(data.user.id)
-        supabase.from('profiles').select('*').eq('id', data.user.id).single()
-          .then(({ data: profile }) => {
-            if (mounted) {
-              if (profile?.onboarding_completed) {
-                router.push('/app/manual')
-              } else {
-                let detectedNameCol = 'display_name';
-                if (profile && 'full_name' in profile) detectedNameCol = 'full_name';
-                else if (profile && 'name' in profile) detectedNameCol = 'name';
-                setNameColumn(detectedNameCol);
+  const loadProfile = useCallback(async () => {
+    setIsLoading(true)
+    setLoadError(null)
 
-                setRole(profile?.role || 'alumno')
-                const loadedName = profile?.full_name || profile?.name || profile?.display_name || '';
-                if (loadedName) {
-                  setFormData(prev => ({ ...prev, display_name: loadedName }))
-                }
-                setIsLoading(false)
-              }
-            }
-          })
-      } else {
-        if (mounted) router.push('/login')
+    // Timeout de 12 segundos para evitar spinner infinito
+    const timeoutId = setTimeout(() => {
+      setIsLoading(false)
+      setLoadError('La conexión tardó demasiado. Verifica tu internet e intenta de nuevo.')
+    }, 12000)
+
+    try {
+      const { data: authData } = await supabase.auth.getUser()
+      if (!authData.user) {
+        clearTimeout(timeoutId)
+        router.push('/login')
+        return
       }
-    })
-    return () => { mounted = false }
+
+      setUserId(authData.user.id)
+
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', authData.user.id)
+        .single()
+
+      clearTimeout(timeoutId)
+
+      if (profileError && profileError.code !== 'PGRST116') {
+        // PGRST116 = no rows found (perfil aún no creado), otros errores son reales
+        console.error('Error cargando perfil:', profileError)
+        setLoadError(
+          profileError.message?.includes('recursion') || profileError.message?.includes('infinite')
+            ? 'Error de configuración en la base de datos (RLS). Contacta al administrador.'
+            : `Error al cargar tu perfil: ${profileError.message}`
+        )
+        setIsLoading(false)
+        return
+      }
+
+      if (profile?.onboarding_completed) {
+        router.push('/app/manual')
+        return
+      }
+
+      let detectedNameCol = 'display_name';
+      if (profile && 'full_name' in profile) detectedNameCol = 'full_name';
+      else if (profile && 'name' in profile) detectedNameCol = 'name';
+      setNameColumn(detectedNameCol);
+
+      setRole(profile?.role || 'alumno')
+      const loadedName = profile?.full_name || profile?.name || profile?.display_name || '';
+      if (loadedName) {
+        setFormData(prev => ({ ...prev, display_name: loadedName }))
+      }
+      setIsLoading(false)
+    } catch (err: any) {
+      clearTimeout(timeoutId)
+      console.error('Error inesperado en onboarding:', err)
+      setLoadError(err?.message || 'Error inesperado. Intenta recargar la página.')
+      setIsLoading(false)
+    }
   }, [router, supabase])
+
+  useEffect(() => {
+    loadProfile()
+  }, [loadProfile])
 
   const handleAddTag = (field: 'software' | 'specialties' | 'genres', e: React.KeyboardEvent<HTMLInputElement>, inputValue: string, setInputValue: (v: string) => void) => {
     if (e.key === 'Enter' || e.key === ',') {
@@ -116,9 +153,32 @@ export default function OnboardingPage() {
 
   if (isLoading) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg1)' }}>
-        <div style={{ width: '30px', height: '30px', borderRadius: '50%', border: '3px solid var(--t4)', borderTopColor: 'var(--vocal)', animation: 'spin 1s linear infinite' }} />
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg1)', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ width: '36px', height: '36px', borderRadius: '50%', border: '3px solid var(--t4)', borderTopColor: 'var(--vocal)', animation: 'spin 1s linear infinite' }} />
+        <p style={{ color: 'var(--t3)', fontSize: '0.85rem' }}>Cargando tu perfil...</p>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    )
+  }
+
+  if (loadError) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg1)', flexDirection: 'column', gap: '20px', padding: '40px', textAlign: 'center' }}>
+        <div style={{ fontSize: '2.5rem' }}>⚠️</div>
+        <h2 style={{ color: 'var(--t1)', fontWeight: 800, fontSize: '1.3rem' }}>No pudimos cargar tu perfil</h2>
+        <p style={{ color: 'var(--t3)', fontSize: '0.9rem', maxWidth: '420px', lineHeight: 1.6 }}>{loadError}</p>
+        <button
+          onClick={loadProfile}
+          style={{ padding: '12px 24px', background: 'var(--vocal)', color: '#fff', border: 'none', borderRadius: 'var(--r2)', fontWeight: 700, cursor: 'pointer', fontSize: '0.95rem' }}
+        >
+          🔄 Reintentar
+        </button>
+        <button
+          onClick={() => router.push('/login')}
+          style={{ padding: '8px 20px', background: 'transparent', color: 'var(--t3)', border: '1px solid var(--border)', borderRadius: 'var(--r2)', fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem' }}
+        >
+          Volver al Login
+        </button>
       </div>
     )
   }

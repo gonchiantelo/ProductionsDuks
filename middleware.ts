@@ -28,7 +28,7 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // 2. Obtener usuario actual
+  // 2. Obtener usuario actual (no lanza excepción, solo retorna null si no hay sesión)
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -37,6 +37,7 @@ export async function middleware(request: NextRequest) {
   const isAuthRoute = path.startsWith('/login') || path.startsWith('/register');
   const isAppRoute = path.startsWith('/app');
   const isAdminRoute = path.startsWith('/admin');
+  const isOnboardingRoute = path === '/app/onboarding';
 
   // 3. Redirigir a login si no hay usuario y se intenta acceder a rutas protegidas
   if (!user && (isAppRoute || isAdminRoute)) {
@@ -45,12 +46,38 @@ export async function middleware(request: NextRequest) {
 
   // 4. Si hay usuario, verificamos permisos según la ruta
   if (user && (isAppRoute || isAdminRoute)) {
-    // Hacemos una consulta rápida a la tabla perfiles para ver rol y suscripción
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role, subscription_status, trial_ends_at, onboarding_completed')
-      .eq('id', user.id)
-      .single()
+    // Consulta defensiva: si Supabase falla (ej: error RLS), no romper la app.
+    // En ese caso dejamos pasar — el usuario verá la UI que manejará el error.
+    let profile = null;
+    let profileError = null;
+
+    try {
+      const result = await supabase
+        .from('profiles')
+        .select('role, subscription_status, trial_ends_at, onboarding_completed')
+        .eq('id', user.id)
+        .single();
+
+      profile = result.data;
+      profileError = result.error;
+    } catch (e) {
+      // Error de red o excepción inesperada — tratamos como si el perfil no cargó
+      profileError = e;
+    }
+
+    // Si hay error de base de datos (ej: recursión RLS), no redirigimos en loop.
+    // Permitimos acceso al onboarding para que el usuario pueda completar su perfil.
+    // Para cualquier otra ruta, también dejamos pasar para que la UI muestre el error.
+    if (profileError) {
+      console.error('[middleware] Error al cargar perfil:', profileError);
+      // Evitar loop: si el error ocurre fuera de onboarding, redirigir ahí UNA SOLA VEZ
+      // No redirigir si ya estamos en onboarding (evita el loop infinito)
+      if (!isOnboardingRoute && isAppRoute) {
+        return NextResponse.redirect(new URL('/app/onboarding', request.url))
+      }
+      // Si ya estamos en onboarding con error, dejamos pasar para que la UI maneje el estado
+      return supabaseResponse;
+    }
 
     const role = profile?.role || 'alumno';
     const subStatus = profile?.subscription_status;
@@ -65,27 +92,24 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/app/manual', request.url))
     }
 
-    // Regla C: Forzar Onboarding (Mover arriba para evitar race conditions con Regla B)
-    const isOnboardingRoute = path === '/app/onboarding'
+    // Regla C: Forzar Onboarding si no está completado
     if ((!profile || !profile.onboarding_completed) && !isOnboardingRoute) {
       return NextResponse.redirect(new URL('/app/onboarding', request.url))
     }
+    // Si ya completó el onboarding y está intentando volver al onboarding, redirigir al manual
     if (profile?.onboarding_completed && isOnboardingRoute) {
       return NextResponse.redirect(new URL('/app/manual', request.url))
     }
 
     // Regla B: Proteger rutas /app (Solo suscripción activa o trial vigente)
-    // Se ignora si ya estamos en /app/onboarding porque el onboarding debe ser accesible.
+    // Se ignora si ya estamos en /app/onboarding (debe ser siempre accesible)
     if (isAppRoute && !hasActiveAccess && path !== '/perfil' && !isOnboardingRoute) {
-      // Si se quedó sin acceso, lo mandamos al perfil para que pague (o renueve)
       return NextResponse.redirect(new URL('/perfil', request.url))
     }
   }
 
   // 5. Si es auth route o la landing y ya está logueado, mandarlo a la app
   if (user && (isAuthRoute || path === '/')) {
-    // Check onboarding here as well? Not strictly needed since they will hit /app/manual and be redirected by middleware again, but we can do it to avoid double redirect.
-    // However, we don't have the profile here. Let's let the double redirect handle it for simplicity.
     return NextResponse.redirect(new URL('/app/manual', request.url))
   }
 
